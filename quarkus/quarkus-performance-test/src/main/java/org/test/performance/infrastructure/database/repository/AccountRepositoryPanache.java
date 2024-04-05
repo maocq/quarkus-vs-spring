@@ -30,10 +30,11 @@ public class AccountRepositoryPanache implements AccountRepository, PanacheRepos
     }
 
     @Override
-    @WithTransaction
+    @WithSession
     public Uni<Account> update(Account account) {
         return this.getSession()
                 .chain(session -> session.merge(this.mapToAccountEntity(account)))
+                .flatMap(accountEntity -> this.persistAndFlush(accountEntity))
                 .map(this::mapToAccount);
     }
 
