@@ -1,39 +1,73 @@
-Quarkus vs Spring boot (Webflux)
+## Results
 
+#### Use case
 
-- DB
-
-```sh
-docker run --name postgres-db -e POSTGRES_PASSWORD=pass -d -p 5432:5432 postgres
+```mermaid
+sequenceDiagram
+    actor Client
+    Client->>Application: 
+    Application->>Database: Query
+    Database->>Application: Response
+    Application->>ExternalService: Request
+    ExternalService->>ExternalService: Simulate latency
+    ExternalService->>Application: Response
+    Application->>Database: Update
+    Database->>Application: Response
+    Application->>Client: Response
 ```
 
-```sql
-CREATE TABLE account
-(
-    id                          SERIAL,
-    user_id                     VARCHAR(200) NOT NULL,
-    account                     VARCHAR(200) NOT NULL,
-    name                        VARCHAR(200) NOT NULL,
-    number                      VARCHAR(200) NOT NULL,
-    balance                     NUMERIC(1000, 2) NOT NULL,
-    currency                    VARCHAR(200) NOT NULL,
-    type                        VARCHAR(200) NOT NULL,
-    bank                        VARCHAR(200) NOT NULL,
-    CONSTRAINT account_pk PRIMARY KEY (id)
-);
+![UseCase](/results/use-case.png)
 
-INSERT INTO public.account
-(id, user_id, account, "name", "number", balance, currency, "type", bank)
-VALUES(4000, 'CC123454000', '4000', 'Debit', 'D16344', 8002543.00, 'COP', '4000', '4000');
+
+#### CPU-bound task - Prime numbers
+
+```mermaid
+sequenceDiagram
+    actor Client
+    Client->>Application:     
+    Application->>Application: Cpu bound task
+    Application->>Client: Response
+```
+
+![CPU](/results/cpu.png)
+
+
+#### External service
+
+```mermaid
+sequenceDiagram
+    actor Client
+    Client->>Application: 
+    Application->>ExternalService: Request
+    ExternalService->>ExternalService: Simulate latency (100 ms)
+    ExternalService->>Application: Response
+    Application->>Client: Response
+```
+
+![ExternalService](/results/external-service.png)
+
+
+#### Query Database
+
+```mermaid
+sequenceDiagram
+    actor Client
+    Client->>Application: 
+    Application->>Database: Query
+    Database->>Application: Response
+    Application->>Client: Response
+```
+
+![QueryDataBase](/results/query-database.png)
+
+
+#### Hello world
+```mermaid
+sequenceDiagram
+    actor Client
+    Client->>Application: 
+    Application->>Client: Hello
 ```
 
 
-```sh
-http://localhost:8080/api/case-one?latency=0
-
-http://localhost:8080/api/case-two?number=10000
-
-http://localhost:8080/api/case-three
-
-http://localhost:8080/api/case-four?latency=0
-```
+![Hello](/results/hello.png)
